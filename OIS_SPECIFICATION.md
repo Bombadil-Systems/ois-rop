@@ -7,7 +7,7 @@ The Offset Instruction Set (OIS) is a projection-based execution format that exp
 
 **Core Principle:** No payload bytes are stored or transmitted. Only references to bytes that already exist in signed system binaries.
 
-**Result:** The "malware" is a list of numbers. The bytes are Microsoft's.
+**Result:** The "malware" is a list of numbers. The bytes are OS's.
 
 ---
 
