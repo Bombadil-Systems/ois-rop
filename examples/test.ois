@@ -1,0 +1,10 @@
+OIS/1.0
+[SUBSTRATES]
+# Using default Windows substrates
+[METADATA]
+source: test_shellcode.bin
+size: 8
+hash: dc47c61890799634
+[PROJECTION]
+k32[0x1CC,0x10DD,0x297,0x181,0x1905,0x3,0x5,0x1055]
+[END]
