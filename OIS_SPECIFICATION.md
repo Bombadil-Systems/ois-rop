@@ -51,7 +51,7 @@ Custom substrates can be defined in the header (see Section 2).
 
 Offsets can be expressed as:
 
-- **Hex:** `0x1055` or `0x1055`
+- **Hex:** `0x1055`
 - **Decimal:** `4181`
 - **Relative:** `+0x10` (relative to previous offset in same substrate)
 
