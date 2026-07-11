@@ -1,6 +1,5 @@
 # OIS-ROP - Offset Instruction Set / Return-Oriented Programming
-
-Obfuscates arbitrary binary payloads by expressing them as coordinate references into legitimate signed Windows system binaries (DLLs). The payload becomes "a list of numbers" while the bytes belong to Microsoft.
+Obfuscates arbitrary binary payloads by expressing them as coordinate references into legitimate signed Windows system binaries (DLLs). The payload becomes "a list of numbers" while the bytes belong to the OS.
 
 ## Tech Stack
 
