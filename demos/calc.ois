@@ -1,0 +1,11 @@
+OIS-ROP/1.0
+[METADATA]
+name: calc
+description: WinExec("calc", 1) - single API call via ROP chain
+author: Chris Aziz / Bombadil Systems
+[SUBSTRATES]
+kernel32.dll
+ntdll.dll
+[CHAIN]
+call kernel32.dll WinExec str:"calc" 1
+[END]

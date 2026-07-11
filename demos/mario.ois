@@ -1,0 +1,22 @@
+OIS-ROP/1.0
+[METADATA]
+name: mario
+description: Super Mario Bros theme - 12 Beep/Sleep calls in one ROP chain
+author: Chris Aziz / Bombadil Systems
+[SUBSTRATES]
+kernel32.dll
+ntdll.dll
+[CHAIN]
+call kernel32.dll Beep 659 125
+call kernel32.dll Beep 659 125
+call kernel32.dll Sleep 125
+call kernel32.dll Beep 659 125
+call kernel32.dll Sleep 167
+call kernel32.dll Beep 523 125
+call kernel32.dll Beep 659 125
+call kernel32.dll Sleep 125
+call kernel32.dll Beep 784 125
+call kernel32.dll Sleep 375
+call kernel32.dll Beep 392 125
+call kernel32.dll Sleep 375
+[END]

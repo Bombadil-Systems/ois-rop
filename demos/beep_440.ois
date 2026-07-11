@@ -1,0 +1,13 @@
+OIS-ROP/1.0
+[METADATA]
+name: conditional_beep
+description: CPU selects frequency at runtime via TEST -> CMOV -> signed DLL gadgets
+author: Chris Aziz / Bombadil Systems
+[SUBSTRATES]
+kernel32.dll
+ntdll.dll
+[CHAIN]
+# cond:test_value:false_val:true_val
+# test=0 -> 440Hz, test=1 -> 880Hz
+call kernel32.dll Beep cond:0:440:880 500
+[END]

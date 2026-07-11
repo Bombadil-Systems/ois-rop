@@ -1,77 +1,73 @@
-# OIS-ROP
+# OIS-ROP - Offset Instruction Set / Return-Oriented Programming
 
-Offset Instruction Set — expresses arbitrary payloads as coordinate references into signed system binaries, with optional ROP chain execution using only gadgets found within those binaries.
+Obfuscates arbitrary binary payloads by expressing them as coordinate references into legitimate signed Windows system binaries (DLLs). The payload becomes "a list of numbers" while the bytes belong to Microsoft.
 
-**This is a security research tool.** It demonstrates that static byte-pattern scanning can be bypassed by never storing payload bytes — instead storing references to bytes that already exist in signed, trusted binaries on the target system. The "payload" is a list of coordinates. The bytes belong to Microsoft.
+## Tech Stack
 
-## How it works
+- **Language:** Python 3.10+
+- **Dependencies:** None (core is dependency-free)
+- **Platform:** Windows (compiler/assembler/executor), cross-platform (parser)
 
-OIS treats signed Windows DLLs (kernel32.dll, ntdll.dll, etc.) as **substrates**. Every possible byte value (0x00–0xFF) exists somewhere in these binaries. An OIS payload is a sequence of `(substrate, offset)` pairs that, when dereferenced at runtime, reconstruct the original bytes.
+## How It Works
 
-The payload on disk or in transit is just text:
-
-```
-k32[0x1CC,0x12D7,0x297,0x1055]
-```
-
-At runtime, each offset is read from the corresponding DLL to produce the actual bytes.
+Instead of storing payload bytes, OIS stores offsets pointing to bytes that already exist in trusted system DLLs like kernel32.dll and ntdll.dll. At runtime, the assembler reads those bytes from the actual DLLs to reconstruct the payload.
 
 ## Components
 
-**compiler.py** — Compiles arbitrary binary payloads into OIS format. Analyzes substrate coverage, selects offsets, outputs in compact, JSON, or OIS file format. Also includes the assembler (OIS → bytes) and executor.
+- **OISCompiler** - Converts bytes to OIS coordinate references
+- **OISParser** - Parses compact, JSON, and file format OIS
+- **OISAssembler** - Reads DLLs to reconstruct bytes from coordinates
+- **OISExecutor** - Executes assembled shellcode via Windows APIs
+- **GadgetFinder** - Discovers ROP gadgets in loaded modules
+- **ROPChain** - Builds and executes return-oriented programming chains
 
-**gadgets.py** — ROP gadget finder. Scans loaded modules for useful instruction sequences (pop/ret, mov, syscall patterns) and builds ROP chains that execute entirely within signed module memory.
-
-**executor.py** — Complete ROP-based execution engine. Chains gadgets from kernel32/ntdll to perform operations (e.g., WinExec) without allocating executable private memory.
-
-## OIS Format
-
-See `OIS_SPECIFICATION.md` for the full format specification.
-
-### Quick example
-
-```python
-from ois_rop import OISCompiler, OISAssembler, OISParser
-
-# Compile bytes to OIS (requires Windows for substrate access)
-compiler = OISCompiler(substrate_ids=['k32', 'ntdll'])
-payload = compiler.compile(b'\x48\x31\xC0\xC3')
-print(payload.to_compact())  # → k32[0x1CC,0x12D7,0x297,0x1055]
-
-# Parse OIS from string (cross-platform)
-parsed = OISParser.parse_compact("k32[0x1CC,0x12D7,0x297,0x1055]")
-
-# Assemble back to bytes (requires Windows for substrate access)
-assembler = OISAssembler()
-shellcode = assembler.assemble(parsed)
-```
-
-### CLI
+## Usage
 
 ```bash
-# Compile a payload to OIS
-ois compile payload.bin -o payload.ois
+pip install -e .
 
-# Analyze substrate coverage
-ois analyze --substrates k32,ntdll
+# Compile payload to OIS format
+ois compile payload.bin -o payload.ois --substrates k32,ntdll
 
-# Validate an OIS file
+# Assemble back to binary (Windows)
+ois assemble payload.ois -o shellcode.bin
+
+# Execute OIS payload (Windows)
+ois execute payload.ois
+
+# Analyze byte coverage
+ois analyze --substrates k32,ntdll,u32
+
+# Validate OIS file
 ois validate payload.ois
-
-# Assemble OIS back to bytes
-ois assemble payload.ois -o output.bin
 ```
 
-## Platform requirements
+## OIS Format Example
 
-The compiler, assembler, and executor require Windows (they read from system DLLs and use Win32 APIs). The format parser and serializer are cross-platform.
+```
+OIS/1.0
+[SUBSTRATES]
+# Using default Windows substrates
+[METADATA]
+name: example
+arch: x64
+[PROJECTION]
+k32[0x1CC,0x12D7,0x297,0x1055]
+ntdll[0x4420,0x4421]
+[END]
+```
 
-## Tests
+## Standard Substrates
 
+`k32` (kernel32), `ntdll`, `u32` (user32), `gdi32`, `advapi`, `ws2` (ws2_32), `crypt` (crypt32), `shell` (shell32), `ole32`, `msvcrt`
+
+## Testing
+
+59 format tests:
 ```bash
-python tests/test_format.py    # Format parsing and serialization (59 tests)
+python tests/test_format.py
 ```
 
-## License
+## Author
 
-MIT — see `LICENSE`.
+Chris Aziz — Bombadil Systems LLC (MIT License)
